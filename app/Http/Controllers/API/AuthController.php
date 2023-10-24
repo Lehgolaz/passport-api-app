@@ -13,26 +13,30 @@ class AuthController extends Controller
         $this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
 
-    public function login(Request $request){
-      $credentials = $request->validate([
-        'email' => 'string|required|email',
-        'password' => 'string|required'
-      ]);
+    function login(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => 'string|required|email',
+            'password' => 'string|required'
+        ]);
 
-      if (auth()->attempt($credentials)) {
-        $user = Auth::user();
-        $user['token'] = $user->createToken('Passport App')->accesssToken;
+        if (auth()->attempt($credentials)) {
+            $user = Auth::user();
+            $user['token'] = $user->createToken('Passport App')->accesssToken;
+            return response()->json([
+                'user' = $user
+            ], 200);
+        }
         return response()->json([
-            'user' = $user
-        ], 200);
-      }
-      return response()->json([
-        'message' = 'Credenciais estão invalidas'
-      ], 402);
+            'message' = 'Credenciais estão invalidas'
+        ], 402);
+    }
+
+    function logout()
+    {
+        Auth::user()->tokens()->delete();
+        return response()->json([
+            'message' = 'Logout realizado com sucesso'
+        ]);
+    }
 }
-}
-
-
-
-
-
